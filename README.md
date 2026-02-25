@@ -105,6 +105,12 @@ Example: `docker push myDockerID/myservice:1`
 ```
 kubectl get nodes
 ```
+**Result :** 
+```
+NAME       STATUS   ROLES           AGE     VERSION
+minikube   Ready    control-plane   4m32s   v1.35.0
+```
+
 ```
 kubectl create deployment myservice --image=efrei/myservice:1
 ```
@@ -117,12 +123,66 @@ Check the pod:
 ```
 kubectl get pods
 ```
+**Result :** 
+```
+NAME                         READY   STATUS              RESTARTS   AGE
+myservice-5f87499856-db5nw   0/1     ContainerCreating   0          5s
+```
 
 Check if the state is running.
 
 Get complete logs for a pods: 
 ```
 kubectl describe pods
+```
+**Result :** 
+```
+kubectl describe pods
+Name:             myservice-5f87499856-db5nw
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             minikube/192.168.49.2
+Start Time:       Wed, 25 Feb 2026 15:08:23 +0100
+Labels:           app=myservice
+                  pod-template-hash=5f87499856
+Annotations:      <none>
+Status:           Running
+IP:               10.244.0.5
+IPs:
+  IP:           10.244.0.5
+Controlled By:  ReplicaSet/myservice-5f87499856
+Containers:
+  myservice:
+    Container ID:   docker://704262e7067ff83b61b71a76375eb4da3148d1e3fc2f9c29d1d8a730819f3f98
+    Image:          claraaitm/myservice:1
+    Image ID:       docker-pullable://claraaitm/myservice@sha256:a497fb25f69249647b722c5c3d2ac477c2412a766ba4accaa45b5914c7087a84
+    Port:           <none>
+    Host Port:      <none>
+    State:          Running
+      Started:      Wed, 25 Feb 2026 15:08:49 +0100
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-t46rt (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True
+  Initialized                 True
+  Ready                       True
+  ContainersReady             True
+  PodScheduled                True
+Volumes:
+  kube-api-access-t46rt:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
 ```
 
 Retreive the IP address but notice that this IP address is ephemeral since a pods can be deleted and replaced by a new one.
@@ -143,6 +203,11 @@ kubectl get pods
 List the containt of the container with:
 ```
 ls
+```
+**Result :** 
+```
+root@myservice-5f87499856-db5nw:/app# ls
+app.jar
 ```
 
 Don't forget to exit the container with:
@@ -180,12 +245,19 @@ Retrieve the service address:
 ```
 minikube service myservice --url
 ```
+**Result :** 
+http://127.0.0.1:13874
+
 
 This format of this address is `NodeIP:NodePort`.
 
 Test this address inside your browser. It should display hello again.
 
 Look from the NodeIP and the NodePort in the minikube dashboard.
+
+**Results :** 
+NodeIP : 192.168.49.2
+NodePort : 31970 
 
 ## Scaling and load balancing
 
@@ -194,11 +266,22 @@ Check if the myservice deployment is running:
 ```
 kubectl get deployments
 ```
+**Result :** 
+```
+NAME        READY   UP-TO-DATE   AVAILABLE   AGE
+myservice   1/1     1            1           31m
+```
 
 How many instance are actually running:
 
 ```
 kubectl get pods
+```
+
+**Result :** 
+```
+NAME                         READY   STATUS    RESTARTS   AGE
+myservice-5f87499856-db5nw   1/1     Running   0          31m
 ```
 
 Start a second instance:
@@ -209,11 +292,22 @@ kubectl scale --replicas=2 deployment/myservice
 ```
 kubectl get deployments
 ```
+**Result :** 
+```
+NAME        READY   UP-TO-DATE   AVAILABLE   AGE
+myservice   2/2     2            2           32m
+```
 
 and 
 
 ```
 kubectl get pods
+```
+**Result :** 
+```
+NAME                         READY   STATUS    RESTARTS   AGE
+myservice-5f87499856-db5nw   1/1     Running   0          32m
+myservice-5f87499856-ps6qd   1/1     Running   0          25s
 ```
 
 again
@@ -241,6 +335,9 @@ kubectl expose deployment myservice --type=LoadBalancer --port=8080
 ```
 minikube service myservice --url
 ```
+Results : 
+http://127.0.0.1:17844
+
 Test in your web browser
 
 ## Rolling updates
