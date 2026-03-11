@@ -348,16 +348,19 @@ To update the image of the application to version 2, use the set image subcomman
 ```
 kubectl set image deployments/my-deployment my-deployment=dockerHudId/my-image:v2
 ```
+**Results : ** deployment.apps/myservice image updated
 
 You can also confirm the update by running the rollout status subcommand:
 ```
 kubectl rollout status deployments/my-deployment
 ```
+**Result :** deployment "myservice" successfully rolled out
 
 To roll back the deployment to your last working version, use the rollout undo subcommand:
 ```
 kubectl rollout undo deployments/my-deployment
 ```
+**Result :** deployment.apps/myservice rolled back
 
 ## Create a deployment and a service using a yaml file
 
@@ -373,11 +376,13 @@ Apply the deployment:
 ```
 kubectl apply -f myservice-deployment.yml
 ```
+**Result :** deployment.apps/myservice configured
 
 Apply the node port service: 
 ```
 kubectl apply -f myservice-service.yml
 ```
+**Result :** service/myservice configured
 
 or 
 
@@ -386,6 +391,9 @@ Apply the service of type loadbalancer:
 kubectl apply -f myservice-loadbalancing-service.yml
 ```
 Then test if it works as expected.
+**Result :** kubectl get pods
+NAME                         READY   STATUS    RESTARTS   AGE
+myservice-746766f779-kmmsc   1/1     Running   0          2m38s
 
 # Routing rule to a service using Ingress
 
@@ -402,10 +410,25 @@ Enable the NGINX Ingress controller:
 ```
 minikube addons enable ingress
 ```
+**Result :**
+💡  ingress est un addon maintenu par Kubernetes. Pour toute question, contactez minikube sur GitHub.
+Vous pouvez consulter la liste des mainteneurs de minikube sur : https://github.com/kubernetes/minikube/blob/master/OWNERS
+💡  Après que le module est activé, veuiller exécuter "minikube tunnel" et vos ressources ingress seront disponibles à "127.0.0.1"
+    ▪ Utilisation de l'image registry.k8s.io/ingress-nginx/controller:v1.14.1
+    ▪ Utilisation de l'image registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.5
+    ▪ Utilisation de l'image registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.5
+🔎  Vérification du module ingress...
+🌟  Le module 'ingress' est activé
+
 Verify that the NGINX Ingress controller is running:
 ```
 kubectl get pods -n ingress-nginx
 ```
+**Result :** 
+NAME                                        READY   STATUS      RESTARTS   AGE
+ingress-nginx-admission-create-wk5kc        0/1     Completed   0          106s
+ingress-nginx-admission-patch-7fjc4         0/1     Completed   1          106s
+ingress-nginx-controller-8675c6b56f-x5wfw   1/1     Running     0          106s
 
 Create a Deployment and expose it as a NodePort (not a loadbalancer).
 
@@ -416,6 +439,7 @@ A yaml file for ingress: https://github.com/charroux/kubernetes-minikube/blob/ma
 ```
 kubectl apply -f ingress.yml
 ```
+**Result : ** ingress.networking.k8s.io/example-ingress created
 
 Retrieve the IP address of Ingress: 
 
@@ -428,6 +452,11 @@ NAME                 CLASS    HOSTS                  ADDRESS        PORTS   AGE
 
 example-ingress      nginx   myservice.info         192.168.64.2   80      18m
 ```
+
+**Result :**
+NAME              CLASS   HOSTS            ADDRESS   PORTS   AGE
+example-ingress   nginx   myservice.info             80      22s
+
 
 On Linux: edit the `/etc/hosts` file and add at the bottom values for: 
 
@@ -456,9 +485,24 @@ Enable a tunnel for Minikube:
 ```
 minikube addons enable ingress-dns
 ```
+** Result :** 
+💡  ingress-dns est un addon maintenu par minikube. Pour toute question, contactez minikube sur GitHub.
+Vous pouvez consulter la liste des mainteneurs de minikube sur : https://github.com/kubernetes/minikube/blob/master/OWNERS
+💡  Après que le module est activé, veuiller exécuter "minikube tunnel" et vos ressources ingress seront disponibles à "127.0.0.1"
+    ▪ Utilisation de l'image docker.io/kicbase/minikube-ingress-dns:0.0.4
+🌟  Le module 'ingress-dns' est activé
+
+
 ```
 minikube tunnel
 ```
+**Result : **
+✅  Tunnel démarré avec succès
+
+📌  REMARQUE : veuillez ne pas fermer ce terminal car ce processus doit rester actif pour que le tunnel soit accessible...
+
+❗  Accéder aux ports inférieurs à 1024 peut échouer sur Windows avec les clients OpenSSH antérieurs à v8.1. Pour plus d'information, voir: https://minikube.sigs.k8s.io/docs/handbook/accessing/#access-to-ports-1024-on-windows-requires-root-permission
+🔗  Tunnel de démarrage pour le service example-ingress.
 
 Then check in your Web browser: 
 
