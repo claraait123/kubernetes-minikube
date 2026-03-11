@@ -516,7 +516,12 @@ Create a second deployment and its service, then add a new route to the ingress.
 ```
 kubectl delete services myservice
 ```
+
+**Result :** service "myservice" deleted from default namespace
+
 ```
 kubectl delete deployment myservice
 ```
+
+**Result :** deployment.apps "myservice" deleted from default namespace
 
